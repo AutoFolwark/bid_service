@@ -1,5 +1,5 @@
 [project]
-name = "vinas-external-api-app"
+name = "bid-service"
 version = "0.1.0"
 description = ""
 authors = [
@@ -19,7 +19,7 @@ dependencies = [
     "grpcio (>=1.76.0,<2.0.0)",
     "protobuf (>=6.33.0,<7.0.0)",
     "fastapi-pagination (>=0.15.0,<0.16.0)",
-    "authtools @ git+https://github.com/vinasLT/shared_auth.git@v0.1.8",
+    "authtools @ git+https://github.com/AutoFolwark/shared_auth.git@v0.1.8",
     "asyncpg (>=0.30.0,<0.31.0)",
     "sqlalchemy (>=2.0.44,<3.0.0)",
     "alembic (>=1.17.1,<2.0.0)",
