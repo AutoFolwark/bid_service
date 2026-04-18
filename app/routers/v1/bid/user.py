@@ -201,12 +201,18 @@ async def bid_on_auction(
 
 
     try:
+        if lot_data.location_offsite and lot_data.location_offsite.upper().strip() != "AT THE BRANCH":
+            location = lot_data.location_offsite
+        else:
+            location = lot_data.location
+        logger.info(f"Desired location from lot for calculator: {location}")
+        
         async with CalculatorRpcClient() as client:
             response = await client.get_calculator_with_data(
                 price=data.bid_amount,
                 auction=data.auction.value,
                 vehicle_type="CAR" if lot_data.vehicle_type.lower() == "automobile" else "MOTO",
-                location=lot_data.location_offsite if lot_data.location_offsite else lot_data.location
+                location=location
             )
     except grpc.aio.AioRpcError as exc:
         logger.exception(f"Error while requesting calculator service: {exc.details()}")
