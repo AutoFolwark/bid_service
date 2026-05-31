@@ -32,18 +32,23 @@ class CalculatorRpcClient(BaseRpcClient[calculator_pb2_grpc.CalculatorServiceStu
         location: str,
         fee_type: str | None = None,
         destination: str | None = None,
+        year: int | None = None,
+        purchase_for_company: bool = False,
     ) -> calculator_pb2.GetCalculatorWithDataResponse:
         request = calculator_pb2.GetCalculatorWithDataRequest(
             price=price,
             auction=auction,
             vehicle_type=vehicle_type,
             location=location,
+            purchase_for_company=purchase_for_company,
         )
 
         if fee_type is not None:
             request.fee_type = fee_type
         if destination is not None:
             request.destination = destination
+        if year is not None:
+            request.year = year
 
         return await self._execute_request(self.stub.GetCalculatorWithData, request)
 
@@ -56,11 +61,14 @@ class CalculatorRpcClient(BaseRpcClient[calculator_pb2_grpc.CalculatorServiceStu
         fee_type_id: int | None = None,
         destination_id: int | None = None,
         location_id: int | None = None,
+        year: int | None = None,
+        purchase_for_company: bool = False,
     ) -> calculator_pb2.GetCalculatorWithIdsResponse:
         request = calculator_pb2.GetCalculatorWithIdsRequest(
             price=price,
             auction=auction,
             vehicle_type=vehicle_type,
+            purchase_for_company=purchase_for_company,
         )
 
         if fee_type_id is not None:
@@ -69,6 +77,8 @@ class CalculatorRpcClient(BaseRpcClient[calculator_pb2_grpc.CalculatorServiceStu
             request.destination_id = destination_id
         if location_id is not None:
             request.location_id = location_id
+        if year is not None:
+            request.year = year
 
         return await self._execute_request(self.stub.GetCalculatorWithIds, request)
 
@@ -85,12 +95,20 @@ class CalculatorRpcClient(BaseRpcClient[calculator_pb2_grpc.CalculatorServiceStu
         price: int,
         auction: str,
         lot_id: str,
+        destination: str | None = None,
+        year: int | None = None,
+        purchase_for_company: bool = False,
     ) -> calculator_pb2.GetCalculatorWithoutDataResponse:
         request = calculator_pb2.GetCalculatorWithoutDataRequest(
             price=price,
             auction=auction,
             lot_id=lot_id,
+            purchase_for_company=purchase_for_company,
         )
+        if destination is not None:
+            request.destination = destination
+        if year is not None:
+            request.year = year
         return await self._execute_request(self.stub.GetCalculatorWithoutData, request)
 
 
@@ -137,3 +155,7 @@ class DetailedInfoService(BaseRpcClient[calculator_pb2_grpc.DetailedInfoServiceS
     ) -> calculator_pb2.GetDetailedFeeTypeResponse:
         request = calculator_pb2.GetDetailedFeeTypeRequest(id=fee_type_id)
         return await self._execute_request(self.stub.GetDetailedFeeType, request)
+
+    async def get_rates(self) -> calculator_pb2.GetRatesResponse:
+        request = calculator_pb2.GetRatesRequest()
+        return await self._execute_request(self.stub.GetRates, request)

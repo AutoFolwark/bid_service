@@ -257,6 +257,28 @@ async def test_bid_on_auction_creates_bid_and_publishes_notification(monkeypatch
 
 
 @pytest.mark.asyncio
+async def test_bid_on_auction_passes_year_and_purchase_for_company_to_calculator(monkeypatch):
+    api_stub = ApiRpcClientStub(
+        lot_items=[_make_lot_data(year=2019)],
+    )
+    calculator_stub = CalculatorRpcClientStub()
+    account_stub = AccountClientStub(account_info=SimpleNamespace(balance=20_000))
+
+    override_auction_client(monkeypatch, api_stub)
+    override_calculator_client(monkeypatch, calculator_stub)
+    override_user_account_client(monkeypatch, account_stub)
+    override_user_publisher(monkeypatch, PublisherStub())
+    override_user_bid_service(monkeypatch, BidPlacementServiceStub(create_result=DummyBid()))
+
+    await _call_bid_on_auction(BidIn(lot_id=21, auction=Auctions.COPART, bid_amount=6_000))
+
+    assert calculator_stub.calls, "Expected calculator call"
+    calculator_call = calculator_stub.calls[0]
+    assert calculator_call["year"] == 2019
+    assert calculator_call["purchase_for_company"] is False
+
+
+@pytest.mark.asyncio
 async def test_bid_on_auction_raises_rpc_problem_when_auction_client_fails(monkeypatch):
     rpc_error = grpc.aio.AioRpcError(grpc.StatusCode.INTERNAL, None, None)
     api_stub = ApiRpcClientStub(rpc_error=rpc_error)
